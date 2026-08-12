@@ -1,5 +1,6 @@
 import { CreateClientUseCase } from "./src/application/clients/use-cases/create-client";
-import { UpdateClientUseCase } from "./src/application/clients/use-cases/update-client";
+import { FindAllClientUseCase } from "./src/application/clients/use-cases/list-clients";
+import { DeleteClientUseCase } from "./src/application/clients/use-cases/delete-client";
 import { InMemoryClientRepository } from "./src/infrastructure/repositories/in-memory-client-repository";
 
 async function main() {
@@ -8,32 +9,47 @@ async function main() {
   const createClientUseCase =
     new CreateClientUseCase(repository);
 
-  const updateClientUseCase =
-    new UpdateClientUseCase(repository);
+  const findAllClientsUseCase =
+    new FindAllClientUseCase(repository);
 
-  const client = await createClientUseCase.execute({
+  const deleteClientUseCase =
+    new DeleteClientUseCase(repository);
+
+  const eduarda = await createClientUseCase.execute({
     name: "Eduarda Silva",
     email: "eduarda@email.com",
     phone: "48999999999",
   });
 
-  console.log("ANTES:");
-  console.log("ID:", client.id);
-  console.log("Nome:", client.name);
-  console.log("Email:", client.email);
-  console.log("Telefone:", client.phone);
-
-  const updatedClient = await updateClientUseCase.execute({
-    id: client.id,
-    name: "Eduarda Caldes",
-    phone: "48911111111",
+  await createClientUseCase.execute({
+    name: "João Souza",
+    email: "joao@email.com",
+    phone: "48988888888",
   });
 
-  console.log("\nDEPOIS:");
-  console.log("ID:", updatedClient?.id);
-  console.log("Nome:", updatedClient?.name);
-  console.log("Email:", updatedClient?.email);
-  console.log("Telefone:", updatedClient?.phone);
+  console.log("ANTES DO DELETE:");
+
+  let clients = await findAllClientsUseCase.execute();
+
+  console.log(
+    clients.map((client) => ({
+      id: client.id,
+      name: client.name,
+    }))
+  );
+
+  await deleteClientUseCase.execute(eduarda.id);
+
+  console.log("\nDEPOIS DO DELETE:");
+
+  clients = await findAllClientsUseCase.execute();
+
+  console.log(
+    clients.map((client) => ({
+      id: client.id,
+      name: client.name,
+    }))
+  );
 }
 
 main();
