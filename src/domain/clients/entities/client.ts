@@ -8,8 +8,19 @@ export interface ClientDtoProps  {
     createdAt?: Date;
 };
 
+type ClientData = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  createdAt: Date;
+};
+
+
+
+
 export class Client {
-    private props: ClientDtoProps;
+    private props: ClientData;
 
     constructor(props: ClientDtoProps){
         this.props = {
@@ -37,6 +48,18 @@ export class Client {
 
   get createdAt() {
     return this.props.createdAt;
+  }
+
+  changeName(name: string) {
+  this.props.name = name;
+  }
+
+  changeEmail(email: string) {
+  this.props.email = email;
+  }
+
+  changePhone(phone: string) {
+  this.props.phone = phone;
   }
 }
 

@@ -1,8 +1,6 @@
 import { CreateClientUseCase } from "./src/application/clients/use-cases/create-client";
-import { FindAllClientUseCase } from "./src/application/clients/use-cases/list-clients";
-import { FindByIdClientUseCase } from "./src/application/clients/use-cases/find-client-by-id"
+import { UpdateClientUseCase } from "./src/application/clients/use-cases/update-client";
 import { InMemoryClientRepository } from "./src/infrastructure/repositories/in-memory-client-repository";
-
 
 async function main() {
   const repository = new InMemoryClientRepository();
@@ -10,42 +8,32 @@ async function main() {
   const createClientUseCase =
     new CreateClientUseCase(repository);
 
-  const listClientsUseCase =
-    new FindAllClientUseCase(repository);
+  const updateClientUseCase =
+    new UpdateClientUseCase(repository);
 
-  const findClientByIdUseCase =
-    new FindByIdClientUseCase(repository);
-
-  const eduarda = await createClientUseCase.execute({
+  const client = await createClientUseCase.execute({
     name: "Eduarda Silva",
     email: "eduarda@email.com",
     phone: "48999999999",
   });
 
-  await createClientUseCase.execute({
-    name: "João Souza",
-    email: "joao@email.com",
-    phone: "48988888888",
+  console.log("ANTES:");
+  console.log("ID:", client.id);
+  console.log("Nome:", client.name);
+  console.log("Email:", client.email);
+  console.log("Telefone:", client.phone);
+
+  const updatedClient = await updateClientUseCase.execute({
+    id: client.id,
+    name: "Eduarda Caldes",
+    phone: "48911111111",
   });
 
-  console.log("ID da Eduarda:");
-  console.log(eduarda.id);
-
-  if (!eduarda.id) {
-    throw new Error("Cliente sem ID");
-  }
-
-  const clientFound = await findClientByIdUseCase.execute(
-    eduarda.id
-  );
-
-  console.log("\nCliente encontrado:");
-  console.log(clientFound);
-
-  const clients = await listClientsUseCase.execute();
-
-  console.log("\nTodos os clientes:");
-  console.log(clients);
+  console.log("\nDEPOIS:");
+  console.log("ID:", updatedClient?.id);
+  console.log("Nome:", updatedClient?.name);
+  console.log("Email:", updatedClient?.email);
+  console.log("Telefone:", updatedClient?.phone);
 }
 
 main();
