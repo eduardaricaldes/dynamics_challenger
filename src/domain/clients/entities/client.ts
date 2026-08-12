@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 
 export interface ClientDtoProps  {
     id?: string;
@@ -13,6 +14,7 @@ export class Client {
     constructor(props: ClientDtoProps){
         this.props = {
             ...props,
+            id:props.id ?? randomUUID(),
             createdAt: props.createdAt  ?? new Date (),
         };
     }
