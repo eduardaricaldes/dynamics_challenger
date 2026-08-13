@@ -8,21 +8,21 @@ type CreateClientDTO = {
 };
 
 export class CreateClientUseCase {
-    constructor(private clientRepository: ClientRepository){
-            this.clientRepository = clientRepository;
+    constructor(private clientRepository: ClientRepository) {
+        this.clientRepository = clientRepository;
 
     }
 
-    async execute(input: CreateClientDTO):Promise<Client> {
+    async execute(input: CreateClientDTO): Promise<Client> {
         const client = new Client({
             name: input.name,
             email: input.email,
             phone: input.phone,
 
         });
-        
-    const createdClient = await this.clientRepository.create(client);
 
-    return createdClient;
+        const createdClient = await this.clientRepository.create(client);
+
+        return createdClient;
     }
 }

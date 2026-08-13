@@ -1,5 +1,5 @@
-import {Client} from "@/domain/clients/entities/client";
-import {ClientRepository} from "@/domain/clients/repositories/client-repository"
+import { Client } from "@/domain/clients/entities/client";
+import { ClientRepository } from "@/domain/clients/repositories/client-repository"
 
 type UpdateClientInput = {
   id: string;
@@ -8,13 +8,13 @@ type UpdateClientInput = {
   phone?: string;
 };
 
-export class UpdateClientUseCase{
-    constructor(private clientRepository:ClientRepository
-    ){}
+export class UpdateClientUseCase {
+  constructor(private clientRepository: ClientRepository
+  ) { }
 
-    async execute(input:UpdateClientInput):Promise<Client | null>{
-        const client = await this.clientRepository.findById(input.id)
-          if (!client) {
+  async execute(input: UpdateClientInput): Promise<Client | null> {
+    const client = await this.clientRepository.findById(input.id)
+    if (!client) {
       return null;
     }
 
@@ -35,5 +35,5 @@ export class UpdateClientUseCase{
 
     return updatedClient;
 
-        }
-    }
+  }
+}
