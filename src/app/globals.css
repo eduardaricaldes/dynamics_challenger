@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@theme {
+  --color-sidebar: #16172B;
+  --color-sidebar-hover: #1E2040;
+  --color-sidebar-border: #252647;
+  --color-app-bg: #F0F2F5;
+}
