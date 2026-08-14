@@ -9,9 +9,7 @@ export async function GET() {
         const clients = await findAllUsecase.execute();
 
         return Response.json(
-            clients.map((client)=>{
-              ClientPresenter.toHTTP(client)
-            })
+            clients.map((client) => ClientPresenter.toHTTP(client))
             );
     } catch (error) {
         return Response.json({ error: "error to list clients"},
