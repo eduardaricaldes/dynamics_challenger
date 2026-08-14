@@ -66,6 +66,34 @@ export class SupabaseClientRepository implements ClientRepository {
         )
     }
 
+    async findByPhone(
+        phone: string
+    ): Promise<Client | null> {
+        const { data, error } = await supabase
+            .from("clients")
+            .select("*")
+            .eq("phone", phone)
+            .maybeSingle();
+
+        if (error) {
+            throw new Error(
+                `Erro ao buscar cliente pelo telefone: ${error.message}`
+            );
+        }
+
+        if (!data) {
+            return null;
+        }
+
+        return new Client({
+            id: data.id,
+            name: data.name,
+            email: data.email,
+            phone: data.phone,
+            createdAt: new Date(data.created_at),
+        });
+    }
+
     async update(client: Client): Promise<Client> {
         const { data, error } = await supabase
             .from("clients")

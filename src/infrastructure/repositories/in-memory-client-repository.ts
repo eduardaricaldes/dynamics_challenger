@@ -20,6 +20,10 @@ export class InMemoryClientRepository implements ClientRepository {
     return client ?? null;
   }
 
+  async findByPhone(phone: string): Promise<Client | null> {
+    return this.clients.find((client) => client.phone === phone) ?? null;
+  }
+
   async update(client: Client): Promise<Client> {
     return client;
   }
