@@ -1,6 +1,7 @@
 import makeDeleteClient from "@/main/factories/delete-client";
 import makeFindByIdClient from "@/main/factories/find-by-id-client";
 import makeUpdateClient from "@/main/factories/update-client";
+import { ClientPresenter } from "@/presentation/presenters/client-presenter";
 
 interface ClientParams {
     params: Promise<{
@@ -28,8 +29,9 @@ export async function GET(req: Request, { params }: ClientParams) {
                 }
             );
         }
+        const response = ClientPresenter.toHTTP(client);
 
-        return Response.json(client);
+        return Response.json(response);
     } catch {
         return Response.json(
             {
@@ -57,7 +59,17 @@ export async function PUT(req: Request, { params }: ClientParams) {
             phone: body.phone,
         });
 
-        return Response.json(client);
+        if(client == null){
+            return Response.json({
+                error:"erro to update client"
+            },{
+                status:400
+            })
+        }
+        
+        const response = ClientPresenter.toHTTP(client);
+
+        return Response.json(response);
     } catch {
         return Response.json(
             {

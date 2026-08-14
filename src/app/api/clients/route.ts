@@ -1,23 +1,20 @@
 import { NextResponse } from "next/server";
 import makeFindAllClients from "@/main/factories/find-all-clients";
 import makeCreateClient from "@/main/factories/create-client";
+import { ClientPresenter } from "@/presentation/presenters/client-presenter";
 
 export async function GET() {
     try {
         const findAllUsecase = makeFindAllClients();
         const clients = await findAllUsecase.execute();
 
-        return NextResponse.json(
-            clients.map((client) => ({
-                id: client.id,
-                name: client.name,
-                email: client.email,
-                phone: client.phone,
-                createdAt: client.createdAt,
-            }))
-        );
+        return Response.json(
+            clients.map((client)=>{
+              ClientPresenter.toHTTP(client)
+            })
+            );
     } catch (error) {
-        return NextResponse.json({ error: "error to list clients"},
+        return Response.json({ error: "error to list clients"},
             {
                 status: 500,
             }
@@ -36,9 +33,10 @@ export async function POST(req: Request){
       email: body.email,
       phone: body.phone,
     });
+    const response = ClientPresenter.toHTTP(client);
 
     return Response.json(
-      client,
+      response,
       {
         status: 201,
       }
