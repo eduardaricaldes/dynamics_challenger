@@ -2,6 +2,7 @@ import makeDeleteClient from "@/main/factories/delete-client";
 import makeFindByIdClient from "@/main/factories/find-by-id-client";
 import makeUpdateClient from "@/main/factories/update-client";
 import { ClientPresenter } from "@/presentation/presenters/client-presenter";
+import { ConflictError } from "@/application/shared/errors/conflict-error";
 
 interface ClientParams {
     params: Promise<{
@@ -70,15 +71,11 @@ export async function PUT(req: Request, { params }: ClientParams) {
         const response = ClientPresenter.toHTTP(client);
 
         return Response.json(response);
-    } catch {
-        return Response.json(
-            {
-                error: "Erro ao atualizar cliente",
-            },
-            {
-                status: 500,
-            }
-        );
+    } catch (error) {
+        if (error instanceof ConflictError) {
+            return Response.json({ error: error.message }, { status: 409 });
+        }
+        return Response.json({ error: "Erro ao atualizar cliente" }, { status: 500 });
     }
 }
 
