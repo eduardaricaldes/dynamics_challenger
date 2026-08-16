@@ -1,13 +1,21 @@
 import OpenAI from "openai";
 import { z } from "zod";
+import { zodTextFormat } from "openai/helpers/zod";
 
-import {LLMProvider,LLMResponse,} from "@/application/chat/gateways/llm-provider";
+import {
+  LLMProvider,
+  LLMHistoryMessage,
+  LLMResponse,
+} from "@/application/chat/gateways/llm-provider";
+
+import { MessageRole } from "@/domain/chat/entities/message";
 
 const responseSchema = z.object({
   intent: z.enum([
     "ORDER",
     "OTHER",
   ]),
+
   answer: z.string(),
 });
 
@@ -21,18 +29,9 @@ export class OpenAILLMProvider
     const apiKey =
       process.env.OPENAI_API_KEY;
 
-    const model =
-      process.env.OPENAI_MODEL;
-
     if (!apiKey) {
       throw new Error(
         "OPENAI_API_KEY não configurada"
-      );
-    }
-
-    if (!model) {
-      throw new Error(
-        "OPENAI_MODEL não configurado"
       );
     }
 
@@ -40,7 +39,22 @@ export class OpenAILLMProvider
       apiKey,
     });
 
-    this.model = model;
+    this.model =
+      process.env.OPENAI_MODEL ||
+      "gpt-5.6";
+  }
+
+  private mapRoleToOpenAI(
+    role: MessageRole
+  ): "user" | "assistant" {
+    if (
+      role === "assistant" ||
+      (role as string) === "model"
+    ) {
+      return "assistant";
+    }
+
+    return "user";
   }
 
   async generateResponse({
@@ -48,76 +62,89 @@ export class OpenAILLMProvider
     history,
   }: {
     message: string;
-    history: {
-      role: "user" | "assistant";
-      content: string;
-    }[];
+    history: LLMHistoryMessage[];
   }): Promise<LLMResponse> {
+    const formattedHistory =
+      history.map((item) => ({
+        role:
+          this.mapRoleToOpenAI(
+            item.role
+          ),
+
+        content: item.content,
+      }));
+
     const response =
-      await this.openai.responses.create({
+      await this.openai.responses.parse({
         model: this.model,
 
         instructions: `
-Você é um atendente virtual da Dynamics Labs.
+          Você é um atendente virtual
+          da Dynamics Labs.
 
-Sua tarefa possui duas responsabilidades:
+          Sua tarefa possui duas
+          responsabilidades:
 
-1. Classificar a intenção da mensagem.
-2. Responder ao cliente.
+          1. Classificar a intenção
+          da mensagem.
 
-As únicas intenções permitidas são:
+          2. Responder ao cliente.
 
-ORDER:
-Use quando a mensagem estiver relacionada
-a pedido, entrega, rastreamento, prazo,
-status ou número de pedido.
+          As únicas intenções
+          permitidas são:
 
-OTHER:
-Use para qualquer outro assunto.
+          ORDER:
+          Use quando a mensagem estiver
+          relacionada a pedido, entrega,
+          rastreamento, prazo, status
+          ou número de pedido.
 
-Esta é uma aplicação de demonstração.
-Você NÃO possui acesso ao sistema real
-de pedidos.
+          OTHER:
+          Use para qualquer outro
+          assunto.
 
-Nunca invente status de pedidos.
+          Esta é uma aplicação
+          de demonstração.
 
-Responda de maneira curta, educada
-e objetiva.
+          Você NÃO possui acesso
+          ao sistema real de pedidos.
 
-Sua resposta deve conter SOMENTE JSON
-válido neste formato:
+          Nunca invente status
+          de pedidos.
 
-{
-  "intent": "ORDER",
-  "answer": "texto da resposta"
-}
+          Responda de maneira curta,
+          educada e objetiva.
         `,
 
         input: [
-          ...history.map((item) => ({
-            role: item.role,
-            content: item.content,
-          })),
+          ...formattedHistory,
 
           {
             role: "user",
             content: message,
           },
         ],
+
+        text: {
+          format: zodTextFormat(
+            responseSchema,
+            "chat_response"
+          ),
+        },
       });
 
-    let parsed: unknown;
+    const parsedResponse =
+      response.output_parsed;
 
-    try {
-      parsed = JSON.parse(
-        response.output_text
-      );
-    } catch {
+    if (!parsedResponse) {
       throw new Error(
-        "LLM retornou JSON inválido"
+        "LLM não retornou uma resposta válida"
       );
     }
 
-    return responseSchema.parse(parsed);
+    return {
+      intent: parsedResponse.intent,
+      answer: parsedResponse.answer,
+    };
   }
 }
