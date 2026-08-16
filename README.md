@@ -35,15 +35,16 @@ Sobe tudo localmente: Next.js + PostgreSQL + PostgREST + nginx gateway.
 Exporte antes de subir:
 
 ```bash
-export OPENAI_API_KEY=sk-...
-export OPENAI_MODEL=gpt-4o-mini
+export GEMINI_API_KEY=...
+export GEMINI_MODEL=gemini-3.6-flash   # opcional
 ```
 
 Ou crie um arquivo `.env` na raiz:
 
 ```env
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
+# Provider atual: Gemini
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-3.6-flash         # opcional
 ```
 
 ### 2. Subir os containers
@@ -172,8 +173,13 @@ Crie `.env.local` na raiz:
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=eyJhbGci...
 
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
+# Provider de IA atual: Gemini
+GEMINI_API_KEY=...
+GEMINI_MODEL=...          # opcional — padrão: gemini-3.6-flash
+
+# Para usar OpenAI em vez de Gemini, veja a seção "Provider de IA"
+# OPENAI_API_KEY=...
+# OPENAI_MODEL=...
 ```
 
 ### 6. Rodar
@@ -255,9 +261,74 @@ src/
 
 ---
 
+## Provider de IA
+
+O projeto implementa dois providers de LLM, ambos seguindo o contrato `LLMProvider`:
+
+```
+SendMessageUseCase
+        ↓
+    LLMProvider (interface)
+        ↑
+GeminiLlmProvider   ←  provider atual
+OpenAILLMProvider   ←  alternativa disponível
+```
+
+`SendMessageUseCase` não depende diretamente de Gemini nem de OpenAI — depende apenas da interface `LLMProvider`. A implementação concreta é escolhida na factory:
+
+```
+src/main/factories/chat/send-message.ts
+```
+
+Isso permite trocar o provider sem tocar na regra de negócio do chat.
+
+---
+
+### Provider atual — Gemini
+
+O projeto está configurado com Gemini:
+
+```ts
+// src/main/factories/chat/send-message.ts
+import { GeminiLlmProvider } from "@/infrastructure/ia/gemini-llm-provider";
+
+const llmProvider = new GeminiLlmProvider();
+```
+
+Variáveis de ambiente necessárias:
+
+```env
+GEMINI_API_KEY=...
+GEMINI_MODEL=...          # opcional — padrão: gemini-3.6-flash
+```
+
+---
+
+### Alternativa — OpenAI
+
+Para usar OpenAI, edite apenas a factory acima:
+
+```ts
+// src/main/factories/chat/send-message.ts
+import { OpenAILLMProvider } from "@/infrastructure/ia/openai-llm-provider";
+
+const llmProvider = new OpenAILLMProvider();
+```
+
+E configure as variáveis correspondentes:
+
+```env
+OPENAI_API_KEY=...
+OPENAI_MODEL=...          # opcional — padrão: gpt-5.6
+```
+
+Nenhum outro arquivo precisa ser alterado.
+
+---
+
 ## Segurança
 
-- `OPENAI_API_KEY` existe apenas no servidor — nunca em variáveis `NEXT_PUBLIC_`
+- Chaves de IA existem apenas no servidor — nunca em variáveis `NEXT_PUBLIC_`
 - Toda comunicação com a LLM ocorre nas API Routes (servidor)
 - Nenhum segredo é exposto ao cliente
 
