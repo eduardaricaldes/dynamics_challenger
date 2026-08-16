@@ -10,6 +10,10 @@ export interface ChatRepository {
     id: string
   ): Promise<Conversation | null>;
 
+  findLatestConversationByClientId(
+    clientId: string
+  ): Promise<Conversation | null>;
+
   createMessages(
     messages: Message[]
   ): Promise<Message[]>;

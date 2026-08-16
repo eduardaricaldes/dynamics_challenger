@@ -3,6 +3,7 @@ import {
   StartConversationResponse,
   SendMessageRequest,
   SendMessageResponse,
+  ConversationHistoryResponse,
 } from "@/types/chat";
 import { apiFetch } from "./api";
 
@@ -14,6 +15,12 @@ export const chatService = {
       method: "POST",
       body: JSON.stringify(data),
     });
+  },
+
+  getHistory(conversationId: string): Promise<ConversationHistoryResponse> {
+    return apiFetch<ConversationHistoryResponse>(
+      `/api/chat/conversations/${conversationId}`
+    );
   },
 
   sendMessage(data: SendMessageRequest): Promise<SendMessageResponse> {

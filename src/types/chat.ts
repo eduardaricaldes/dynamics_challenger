@@ -27,3 +27,9 @@ export interface SendMessageResponse {
   answer: string;
   messages: ChatMessage[];
 }
+
+export interface ConversationHistoryResponse {
+  client: { id: string; name: string; email: string; phone: string };
+  conversation: { id: string; clientId: string; createdAt: string };
+  messages: ChatMessage[];
+}

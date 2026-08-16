@@ -32,6 +32,32 @@ export class SupabaseChatRepository
     });
   }
 
+  async findLatestConversationByClientId(
+    clientId: string
+  ): Promise<Conversation | null> {
+    const { data, error } = await supabase
+      .from("conversations")
+      .select("*")
+      .eq("client_id", clientId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error(
+        `Erro ao buscar conversa do cliente: ${error.message}`
+      );
+    }
+
+    if (!data) return null;
+
+    return new Conversation({
+      id: data.id,
+      clientId: data.client_id,
+      createdAt: new Date(data.created_at),
+    });
+  }
+
   async findConversationById(id: string): Promise<Conversation | null> {
     const { data, error } = await supabase
       .from("conversations")

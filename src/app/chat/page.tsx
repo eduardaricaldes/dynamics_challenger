@@ -96,7 +96,18 @@ export default function ChatPage() {
     setStarting(true);
     try {
       const conv = await chatService.startConversation({ phone: client.phone });
-      setConversationId(conv.conversation.id);
+      const convId = conv.conversation.id;
+      setConversationId(convId);
+
+      const history = await chatService.getHistory(convId);
+      setMessages(
+        history.messages.map((m) => ({
+          id: m.id,
+          role: m.role,
+          content: m.content,
+          intent: m.intent,
+        }))
+      );
     } finally {
       setStarting(false);
     }
