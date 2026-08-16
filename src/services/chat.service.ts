@@ -10,7 +10,7 @@ export const chatService = {
   startConversation(
     data: StartConversationRequest
   ): Promise<StartConversationResponse> {
-    return apiFetch<StartConversationResponse>("/api/chat/conversations", {
+    return apiFetch<StartConversationResponse>("/api/chat/start", {
       method: "POST",
       body: JSON.stringify(data),
     });

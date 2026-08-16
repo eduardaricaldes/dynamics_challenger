@@ -9,13 +9,12 @@ export interface ChatMessage {
 }
 
 export interface StartConversationRequest {
-  clientId: string;
+  phone: string;
 }
 
 export interface StartConversationResponse {
-  id: string;
-  clientId: string;
-  createdAt: string;
+  client: { id: string; name: string; email: string; phone: string };
+  conversation: { id: string; clientId: string; createdAt: string };
 }
 
 export interface SendMessageRequest {

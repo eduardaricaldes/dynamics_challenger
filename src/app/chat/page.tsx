@@ -95,8 +95,8 @@ export default function ChatPage() {
     setMobileView("chat");
     setStarting(true);
     try {
-      const conv = await chatService.startConversation({ clientId: client.id });
-      setConversationId(conv.id);
+      const conv = await chatService.startConversation({ phone: client.phone });
+      setConversationId(conv.conversation.id);
     } finally {
       setStarting(false);
     }
