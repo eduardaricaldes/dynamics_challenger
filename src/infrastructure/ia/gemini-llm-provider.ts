@@ -96,10 +96,6 @@ export class GeminiLlmProvider implements LLMProvider {
 
     const parsedResponse = JSON.parse(rawText) as LLMResponse;
 
-    console.log(result)
-    console.log(rawText)
-    console.log(parsedResponse)
-
     return {
       intent: parsedResponse.intent,
       answer: parsedResponse.answer,
