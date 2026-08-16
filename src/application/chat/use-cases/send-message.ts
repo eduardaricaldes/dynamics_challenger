@@ -1,7 +1,7 @@
 import { ChatRepository } from "@/domain/chat/repositories/chat-repository";
 import { Message } from "@/domain/chat/entities/message";
 import { NotFoundError } from "@/application/shared/errors/not-found-error";
-import { LLMProvider } from "../gatways/llm-provider";
+import { LLMProvider } from "../gateways/llm-provider";
 
 interface SendMessageRequest {
   conversationId: string;

@@ -1,5 +1,5 @@
 import { NotFoundError } from "@/application/shared/errors/not-found-error";
-import makeSendMessage from "@/main/factories/send-message";
+import { makeSendMessage } from "@/main/factories/chat/send-message";
 import { ChatPresenter } from "@/presentation/presenters/chat-presenter";
 
 export async function POST(req:Request) {

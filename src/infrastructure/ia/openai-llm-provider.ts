@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { z } from "zod";
 
-import {LLMProvider,LLMResponse,} from "@/application/chat/gatways/llm-provider";
+import {LLMProvider,LLMResponse,} from "@/application/chat/gateways/llm-provider";
 
 const responseSchema = z.object({
   intent: z.enum([

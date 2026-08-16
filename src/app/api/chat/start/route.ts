@@ -1,4 +1,3 @@
-import { StartChatUseCase } from "@/application/chat/use-cases/start-chat";
 import { NotFoundError } from "@/application/shared/errors/not-found-error";
 import { makeStartChat } from "@/main/factories/chat/start-chat";
 import { ChatPresenter } from "@/presentation/presenters/chat-presenter";
