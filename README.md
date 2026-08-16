@@ -1,38 +1,199 @@
-<<<<<<< HEAD
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Dynamics Desk
 
-## Getting Started
+Central de atendimento ao cliente com IA — Desafio Técnico Dynamics Labs.
 
-First, run the development server:
+Simula uma ferramenta de suporte estilo WhatsApp: lista de clientes, chat com IA classificando intenções e dashboard com métricas reais.
+
+---
+
+## Stack
+
+| Camada | Tecnologia |
+|--------|-----------|
+| Framework | Next.js 16.3 (App Router) |
+| Frontend | React 19 + TypeScript + Tailwind CSS v4 |
+| Backend | Next.js API Routes (mesma aplicação) |
+| Banco de dados | Supabase (PostgreSQL) |
+| IA | OpenAI Responses API |
+| Gráficos | Recharts |
+| Ícones | lucide-react |
+| Validação | Zod |
+
+---
+
+## Pré-requisitos
+
+- Node.js 18+
+- Conta no [Supabase](https://supabase.com)
+- Conta na [OpenAI](https://platform.openai.com)
+
+---
+
+## Configuração
+
+### 1. Instalar dependências
+
+```bash
+npm install
+```
+
+### 2. Variáveis de ambiente
+
+Crie ou edite o arquivo `.env.local` na raiz:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=eyJhbGci...
+
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4o-mini
+```
+
+> A chave da OpenAI **nunca é exposta ao frontend** — todas as chamadas à IA acontecem exclusivamente nas API Routes do servidor.
+
+### 3. Banco de dados (Supabase)
+
+Execute no **SQL Editor** do Supabase:
+
+```sql
+-- Clientes
+CREATE TABLE clients (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Conversas
+CREATE TABLE conversations (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id UUID NOT NULL REFERENCES clients(id),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Mensagens
+CREATE TABLE messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  conversation_id UUID NOT NULL REFERENCES conversations(id),
+  role TEXT NOT NULL CHECK (role IN ('user', 'assistant')),
+  content TEXT NOT NULL,
+  intent TEXT CHECK (intent IS NULL OR intent IN ('ORDER', 'OTHER')),
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+-- Desabilitar RLS para desenvolvimento
+ALTER TABLE clients DISABLE ROW LEVEL SECURITY;
+ALTER TABLE conversations DISABLE ROW LEVEL SECURITY;
+ALTER TABLE messages DISABLE ROW LEVEL SECURITY;
+```
+
+---
+
+## Rodar o projeto
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Acesse: **http://localhost:3000**
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Funcionalidades
 
-## Learn More
+### Dashboard (`/dashboard`)
+- Total de clientes cadastrados
+- Total de mensagens atendidas
+- Contagem de intenções ORDER (pedidos) e OTHER (outros)
+- Gráfico de área: atendimentos por dia nos últimos 7 dias
+- PieChart: distribuição de intenções
 
-To learn more about Next.js, take a look at the following resources:
+### Clientes (`/clients`)
+- Listagem com busca por nome, e-mail ou telefone
+- Avatar com iniciais e cor determinística por nome
+- Criar, editar e remover clientes
+- Skeleton loading e empty states
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Chat (`/chat`)
+- Lista de clientes à esquerda com busca
+- Ao selecionar um cliente, inicia uma conversa automaticamente
+- Mensagens em tempo real com indicador de digitação (...)
+- Respostas da IA com badge de intenção: **Pedido** (ORDER) ou **Outro** (OTHER)
+- Enter para enviar, Shift+Enter para quebrar linha
+- Layout responsivo: mobile mostra lista ou chat alternadamente
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Arquitetura
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+O projeto segue **Clean Architecture** com separação em camadas:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
+```
+src/
+├── app/                        # Next.js App Router
+│   ├── api/                    # Route Handlers (backend)
+│   │   ├── clients/            # CRUD de clientes
+│   │   ├── chat/
+│   │   │   ├── start/          # POST /api/chat/start
+│   │   │   ├── messages/       # POST /api/chat/messages
+│   │   │   └── conversations/  # GET /api/chat/conversations/:id
+│   │   └── dashboard/          # GET /api/dashboard
+│   ├── chat/                   # Página de chat
+│   ├── clients/                # Página de clientes
+│   └── dashboard/              # Página de dashboard
+│
+├── domain/                     # Entidades e interfaces (sem dependências externas)
+│   ├── chat/
+│   └── clients/
+│
+├── application/                # Casos de uso
+│   ├── chat/
+│   └── clients/
+│
+├── infrastructure/             # Implementações concretas
+│   ├── database/               # Supabase client
+│   ├── ia/                     # OpenAI provider
+│   └── repositories/           # Supabase repositories
+│
+├── main/factories/             # Composição de dependências
+├── presentation/presenters/    # Serialização HTTP
+├── services/                   # Serviços do lado cliente (chamam /api)
+├── components/                 # Componentes React
+└── types/                      # Tipos compartilhados
+```
+
+---
+
+## API
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/clients` | Lista todos os clientes |
+| POST | `/api/clients` | Cria um cliente |
+| GET | `/api/clients/:id` | Busca cliente por ID |
+| PUT | `/api/clients/:id` | Atualiza cliente |
+| DELETE | `/api/clients/:id` | Remove cliente |
+| POST | `/api/chat/start` | Inicia conversa (por telefone) |
+| POST | `/api/chat/messages` | Envia mensagem e obtém resposta da IA |
+| GET | `/api/chat/conversations/:id` | Histórico de uma conversa |
+| GET | `/api/dashboard` | Métricas e dados dos gráficos |
+
+---
+
+## Segurança
+
+- `OPENAI_API_KEY` existe apenas no servidor — nunca em variáveis `NEXT_PUBLIC_`
+- Toda comunicação com a LLM ocorre nas API Routes (servidor)
+- Nenhum segredo é exposto ao cliente
+
+---
+
+## Scripts
+
+```bash
+npm run dev      # Servidor de desenvolvimento
+npm run build    # Build de produção
+npm run start    # Servidor de produção
+npm run lint     # Lint com ESLint
+```
