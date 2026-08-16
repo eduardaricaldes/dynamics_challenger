@@ -13,16 +13,25 @@ import { ChartDataPoint } from "@/types/dashboard";
 
 export default function DashboardPage() {
   const [totalClients, setTotalClients] = useState(0);
+  const [totalMessages, setTotalMessages] = useState(0);
+  const [orderMessages, setOrderMessages] = useState(0);
+  const [otherMessages, setOtherMessages] = useState(0);
+  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [chartData, setChartData] = useState<ChartDataPoint[]>([]);
 
   useEffect(() => {
     async function load() {
       try {
-        const clients = await clientsService.list();
+        const [clients, stats] = await Promise.all([
+          clientsService.list(),
+          dashboardService.getStats(),
+        ]);
         setTotalClients(clients.length);
-        setChartData(dashboardService.getChartData());
+        setTotalMessages(stats.totalMessages);
+        setOrderMessages(stats.orderMessages);
+        setOtherMessages(stats.otherMessages);
+        setChartData(stats.chartData);
       } catch {
         setError("Não foi possível carregar os dados do dashboard.");
       } finally {
@@ -69,23 +78,23 @@ export default function DashboardPage() {
         <MetricCard
           icon={MessageSquare}
           title="Mensagens atendidas"
-          value="—"
-          description="Dado disponível após endpoint /api/dashboard"
+          value={loading ? "—" : totalMessages}
+          description="Total de mensagens trocadas"
           variant="emerald"
           loading={loading}
         />
         <MetricCard
           icon={ShoppingCart}
-          title="Perguntas de pedido"
-          value="—"
-          description="Classificadas como ORDER_QUESTION"
+          title="Sobre pedidos"
+          value={loading ? "—" : orderMessages}
+          description="Classificadas como ORDER"
           variant="violet"
           loading={loading}
         />
         <MetricCard
           icon={HelpCircle}
           title="Outro assunto"
-          value="—"
+          value={loading ? "—" : otherMessages}
           description="Classificadas como OTHER"
           variant="amber"
           loading={loading}
@@ -94,10 +103,13 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
         <div className="xl:col-span-2">
-          <ConversationsChart data={chartData} />
+          <ConversationsChart data={chartData} loading={loading} />
         </div>
         <div>
-          <IntentionChart orderQuestions={0} otherQuestions={0} />
+          <IntentionChart
+            orderQuestions={orderMessages}
+            otherQuestions={otherMessages}
+          />
         </div>
       </div>
     </div>
