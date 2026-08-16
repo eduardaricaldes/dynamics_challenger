@@ -1,9 +1,8 @@
 import { StartChatUseCase } from "@/application/chat/use-cases/start-chat";
 import { SupabaseChatRepository } from "@/infrastructure/repositories/supabase-chat-repository";
 import { SupabaseClientRepository } from "@/infrastructure/repositories/supabase-client-repository";
-import { StartChatController } from "@/app/api/chat/start/route";
 
-export function makeStartChatController() {
+export function makeStartChat():StartChatUseCase {
   const clientRepository = new SupabaseClientRepository();
   const chatRepository = new SupabaseChatRepository();
 
@@ -13,7 +12,5 @@ export function makeStartChatController() {
       chatRepository
     );
 
-  return new StartChatController(
-    useCase
-  );
+  return useCase;
 }

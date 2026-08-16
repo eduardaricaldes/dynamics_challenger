@@ -1,19 +1,13 @@
 import { StartChatUseCase } from "@/application/chat/use-cases/start-chat";
 import { NotFoundError } from "@/application/shared/errors/not-found-error";
+import { makeStartChat } from "@/main/factories/chat/start-chat";
 import { ChatPresenter } from "@/presentation/presenters/chat-presenter";
 
-export class StartChatController {
-  constructor(
-    private readonly useCase:
-      StartChatUseCase
-  ) {}
+export async function POST(req:Request) {
 
-  async handle(
-    request: Request
-  ): Promise<Response> {
-    try {
+   try {
       const body =
-        await request.json();
+        await req.json();
 
       if (!body.phone) {
         return Response.json(
@@ -27,8 +21,10 @@ export class StartChatController {
         );
       }
 
+      const useCase = makeStartChat();
+
       const result =
-        await this.useCase.execute({
+        await useCase.execute({
           phone: body.phone,
         });
 
@@ -75,5 +71,5 @@ export class StartChatController {
         }
       );
     }
-  }
+  
 }

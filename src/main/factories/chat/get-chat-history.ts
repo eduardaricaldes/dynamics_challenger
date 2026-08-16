@@ -1,9 +1,8 @@
 import { GetChatHistoryUseCase } from "@/application/chat/use-cases/get-chat-history";
 import { SupabaseChatRepository } from "@/infrastructure/repositories/supabase-chat-repository";
 import { SupabaseClientRepository } from "@/infrastructure/repositories/supabase-client-repository";
-import { GetChatHistoryController } from "@/app/api/chat/[conversationId]";
 
-export function makeGetChatHistoryController() {
+export function makeGetChatHistory():GetChatHistoryUseCase {
   const chatRepository =
     new SupabaseChatRepository();
 
@@ -16,7 +15,5 @@ export function makeGetChatHistoryController() {
       clientRepository
     );
 
-  return new GetChatHistoryController(
-    useCase
-  );
+    return useCase;
 }
