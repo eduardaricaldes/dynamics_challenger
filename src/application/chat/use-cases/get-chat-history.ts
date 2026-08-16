@@ -1,42 +1,53 @@
-import { Conversation } from "@/domain/chat/entities/conversation";
-import { Message } from "@/domain/chat/entities/message";
-import { Client } from "@/domain/clients/entities/client";
+import { ClientRepository } from "@/domain/clients/repositories/client-repository";
+import { ChatRepository } from "@/domain/chat/repositories/chat-repository";
+import { NotFoundError } from "@/application/shared/errors/not-found-error";
 
-export class ChatPresenter {
-  static conversationToHTTP(
-    conversation: Conversation
-  ) {
-    return {
-      id: conversation.id,
-      clientId: conversation.clientId,
-      createdAt:
-        conversation.createdAt,
-    };
-  }
+export class GetChatHistoryUseCase {
+  constructor(
+    private readonly chatRepository:
+      ChatRepository,
 
-  static messageToHTTP(
-    message: Message
-  ) {
-    return {
-      id: message.id,
-      conversationId:
-        message.conversationId,
-      role: message.role,
-      content: message.content,
-      intent:
-        message.intent ?? null,
-      createdAt: message.createdAt,
-    };
-  }
+    private readonly clientRepository:
+      ClientRepository
+  ) {}
 
-  static clientToHTTP(
-    client: Client
+  async execute(
+    conversationId: string
   ) {
+    const conversation =
+      await this.chatRepository
+        .findConversationById(
+          conversationId
+        );
+
+    if (!conversation) {
+      throw new NotFoundError(
+        "Conversa não encontrada"
+      );
+    }
+
+    const client =
+      await this.clientRepository
+        .findById(
+          conversation.clientId
+        );
+
+    if (!client) {
+      throw new NotFoundError(
+        "Cliente não encontrado"
+      );
+    }
+
+    const messages =
+      await this.chatRepository
+        .findMessagesByConversationId(
+          conversationId
+        );
+
     return {
-      id: client.id,
-      name: client.name,
-      email: client.email,
-      phone: client.phone,
+      client,
+      conversation,
+      messages,
     };
   }
 }

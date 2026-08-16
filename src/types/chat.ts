@@ -1,21 +1,30 @@
-export type Intent = "ORDER_QUESTION" | "OTHER";
+export type Intent = "ORDER" | "OTHER";
 
 export interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
-  intent?: Intent;
+  intent?: Intent | null;
+  createdAt: string;
+}
+
+export interface StartConversationRequest {
+  clientId: string;
+}
+
+export interface StartConversationResponse {
+  id: string;
+  clientId: string;
   createdAt: string;
 }
 
 export interface SendMessageRequest {
-  clientId: string;
+  conversationId: string;
   message: string;
 }
 
 export interface SendMessageResponse {
-  message: string;
   intent: Intent;
-  response: string;
-  createdAt: string;
+  answer: string;
+  messages: ChatMessage[];
 }
