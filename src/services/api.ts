@@ -16,9 +16,7 @@ export async function apiFetch<T>(
     throw new Error(body?.error ?? `HTTP ${res.status}`);
   }
 
-  if (res.status === 200 && res.headers.get("content-length") === "0") {
-    return undefined as T;
-  }
-
-  return res.json();
+  const text = await res.text();
+  if (!text) return undefined as T;
+  return JSON.parse(text) as T;
 }

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import makeFindAllClients from "@/main/factories/find-all-clients";
 import makeCreateClient from "@/main/factories/create-client";
 import { ClientPresenter } from "@/presentation/presenters/client-presenter";
+import { ConflictError } from "@/application/shared/errors/conflict-error";
 
 export async function GET() {
     try {
@@ -39,15 +40,11 @@ export async function POST(req: Request){
         status: 201,
       }
     );
-  } catch {
-    return Response.json(
-      {
-        error: "Erro ao criar cliente",
-      },
-      {
-        status: 500,
-      }
-    );
+  } catch (error) {
+    if (error instanceof ConflictError) {
+      return Response.json({ error: error.message }, { status: 409 });
+    }
+    return Response.json({ error: "Erro ao criar cliente" }, { status: 500 });
   }
 }
 

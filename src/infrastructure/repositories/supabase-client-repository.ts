@@ -1,5 +1,6 @@
 import { Client } from "@/domain/clients/entities/client";
 import { ClientRepository } from "@/domain/clients/repositories/client-repository";
+import { ConflictError } from "@/application/shared/errors/conflict-error";
 import { supabase } from "../database/supabase";
 
 export class SupabaseClientRepository implements ClientRepository {
@@ -13,6 +14,9 @@ export class SupabaseClientRepository implements ClientRepository {
         }).select().single()
 
         if (error) {
+            if (error.code === "23505") {
+                throw new ConflictError("Este número de telefone já está cadastrado.");
+            }
             throw new Error(`Erro ao criar cliente: ${error.message}`);
         }
         return new Client({
@@ -107,7 +111,10 @@ export class SupabaseClientRepository implements ClientRepository {
             .single();
 
         if (error) {
-            throw new Error(`Erro ao atualizar cliente: ${error.message}`)
+            if (error.code === "23505") {
+                throw new ConflictError("Este número de telefone já está cadastrado.");
+            }
+            throw new Error(`Erro ao atualizar cliente: ${error.message}`);
         }
         return new Client({
             id: data.id,

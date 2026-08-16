@@ -32,8 +32,10 @@ export function ClientForm({ client, onClose, onSave }: ClientFormProps) {
     try {
       await onSave(form);
       onClose();
-    } catch {
-      setError("Erro ao salvar cliente. Tente novamente.");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Erro ao salvar cliente. Tente novamente."
+      );
     } finally {
       setLoading(false);
     }
