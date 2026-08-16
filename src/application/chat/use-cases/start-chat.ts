@@ -16,6 +16,7 @@ export class StartChatUseCase {
     ) { }
 
     async execute({ phone }: StartChatrequest) {
+
         const client = await this.clientRepository.findByPhone(phone)
         if (!client) {
             throw new NotFoundError("client not found")
@@ -24,12 +25,15 @@ export class StartChatUseCase {
             clientId: client.id,
         });
 
-        const createdConversation = 
-        await this.chatRepository.createConversation(conversation);
+        const createdConversation = await this
+        .chatRepository
+        .createConversation(conversation);
 
         return {
             client,
-            createdConversation:createdConversation}
+            createdConversation,
+        };
     }
+
 
 }
