@@ -44,7 +44,7 @@ export async function POST(req: Request){
     if (error instanceof ConflictError) {
       return Response.json({ error: error.message }, { status: 409 });
     }
-    return Response.json({ error: "Erro ao criar cliente" }, { status: 500 });
+    return Response.json({ error: "Failed to create client" }, { status: 500 });
   }
 }
 

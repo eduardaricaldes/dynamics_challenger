@@ -8,7 +8,7 @@ export class GeminiLlmProvider implements LLMProvider {
   constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      throw new Error("GEMINI_API_KEY não foi encontrada nas variáveis de ambiente.");
+      throw new Error("GEMINI_API_KEY not found in environment variables.");
     }
     this.client = new GoogleGenerativeAI(apiKey);
     this.model = process.env.GEMINI_MODEL || "gemini-3.6-flash";

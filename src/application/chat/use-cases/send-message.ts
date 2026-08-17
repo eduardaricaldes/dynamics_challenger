@@ -19,7 +19,7 @@ export class SendMessageUseCase {
 
     if (!conversation) {
       throw new NotFoundError(
-        "Conversa não encontrada"
+        "Conversation not found"
       );
     }
 

@@ -14,7 +14,7 @@ export async function POST(req:Request) {
         return Response.json(
           {
             error:
-              "conversationId e message são obrigatórios",
+              "conversationId and message are required",
           },
           {
             status: 400,
@@ -63,7 +63,7 @@ export async function POST(req:Request) {
       return Response.json(
         {
           error:
-            "Erro ao enviar mensagem",
+            "Failed to send message",
         },
         {
           status: 500,

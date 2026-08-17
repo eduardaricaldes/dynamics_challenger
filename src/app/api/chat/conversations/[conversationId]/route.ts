@@ -54,7 +54,7 @@ export async function GET(req: Request,{params}:ConversationParams) {
     return Response.json(
       {
         error:
-          "Erro ao buscar histórico",
+          "Failed to fetch conversation history",
       },
       {
         status: 500,

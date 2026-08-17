@@ -15,9 +15,9 @@ export class SupabaseClientRepository implements ClientRepository {
 
         if (error) {
             if (error.code === "23505") {
-                throw new ConflictError("Este número de telefone já está cadastrado.");
+                throw new ConflictError("This phone number is already registered.");
             }
-            throw new Error(`Erro ao criar cliente: ${error.message}`);
+            throw new Error(`Failed to create client: ${error.message}`);
         }
         return new Client({
             id: data.id,
@@ -32,7 +32,7 @@ export class SupabaseClientRepository implements ClientRepository {
             .from("clients")
             .select("*");
         if (error) {
-            throw new Error(`Erro ao listar clientes:${error.message}`)
+            throw new Error(`Failed to list clients: ${error.message}`)
         }
         return data.map((client) => {
             return new Client({
@@ -52,7 +52,7 @@ export class SupabaseClientRepository implements ClientRepository {
             .maybeSingle()
 
         if (error) {
-            throw new Error(`Erro ao buscar cliente: ${error.message}`);
+            throw new Error(`Failed to find client: ${error.message}`);
         }
 
         if (!data) {
@@ -81,7 +81,7 @@ export class SupabaseClientRepository implements ClientRepository {
 
         if (error) {
             throw new Error(
-                `Erro ao buscar cliente pelo telefone: ${error.message}`
+                `Failed to find client by phone: ${error.message}`
             );
         }
 
@@ -112,9 +112,9 @@ export class SupabaseClientRepository implements ClientRepository {
 
         if (error) {
             if (error.code === "23505") {
-                throw new ConflictError("Este número de telefone já está cadastrado.");
+                throw new ConflictError("This phone number is already registered.");
             }
-            throw new Error(`Erro ao atualizar cliente: ${error.message}`);
+            throw new Error(`Failed to update client: ${error.message}`);
         }
         return new Client({
             id: data.id,
@@ -130,7 +130,7 @@ export class SupabaseClientRepository implements ClientRepository {
             .eq("id", id)
 
         if (error) {
-            throw new Error(`Erro ao deletar cliente: ${error.message}`);
+            throw new Error(`Failed to delete client: ${error.message}`);
         }
     }
 

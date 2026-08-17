@@ -23,7 +23,7 @@ export async function GET(req: Request, { params }: ClientParams) {
         if (!client) {
             return Response.json(
                 {
-                    error: "Cliente não encontrado",
+                    error: "Client not found",
                 },
                 {
                     status: 404,
@@ -36,7 +36,7 @@ export async function GET(req: Request, { params }: ClientParams) {
     } catch {
         return Response.json(
             {
-                error: "Erro ao buscar cliente",
+                error: "Failed to fetch client",
             },
             {
                 status: 500,
@@ -62,7 +62,7 @@ export async function PUT(req: Request, { params }: ClientParams) {
 
         if(client == null){
             return Response.json({
-                error:"erro to update client"
+                error:"Failed to update client"
             },{
                 status:400
             })
@@ -75,7 +75,7 @@ export async function PUT(req: Request, { params }: ClientParams) {
         if (error instanceof ConflictError) {
             return Response.json({ error: error.message }, { status: 409 });
         }
-        return Response.json({ error: "Erro ao atualizar cliente" }, { status: 500 });
+        return Response.json({ error: "Failed to update client" }, { status: 500 });
     }
 }
 
@@ -92,7 +92,7 @@ export async function DELETE(req: Request, { params }: ClientParams) {
     } catch {
         return Response.json(
             {
-                error: "Erro ao deletar cliente",
+                error: "Failed to delete client",
             },
             {
                 status: 500,

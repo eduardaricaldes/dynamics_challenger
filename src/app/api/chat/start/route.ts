@@ -12,7 +12,7 @@ export async function POST(req:Request) {
         return Response.json(
           {
             error:
-              "Telefone é obrigatório",
+              "Phone is required",
           },
           {
             status: 400,
@@ -63,7 +63,7 @@ export async function POST(req:Request) {
       return Response.json(
         {
           error:
-            "Erro ao iniciar conversa",
+            "Failed to start conversation",
         },
         {
           status: 500,

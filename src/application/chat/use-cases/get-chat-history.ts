@@ -22,7 +22,7 @@ export class GetChatHistoryUseCase {
 
     if (!conversation) {
       throw new NotFoundError(
-        "Conversa não encontrada"
+        "Conversation not found"
       );
     }
 
@@ -34,7 +34,7 @@ export class GetChatHistoryUseCase {
 
     if (!client) {
       throw new NotFoundError(
-        "Cliente não encontrado"
+        "Client not found"
       );
     }
 

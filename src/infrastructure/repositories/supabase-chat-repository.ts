@@ -20,7 +20,7 @@ export class SupabaseChatRepository
 
     if (error) {
       throw new Error(
-        `Erro ao criar conversa: ${error.message}`
+        `Failed to create conversation:${error.message}`
       );
     }
 
@@ -45,7 +45,7 @@ export class SupabaseChatRepository
 
     if (error) {
       throw new Error(
-        `Erro ao buscar conversa do cliente: ${error.message}`
+        `Failed to find conversation by client: ${error.message}`
       );
     }
 
@@ -67,7 +67,7 @@ export class SupabaseChatRepository
 
     if (error) {
       throw new Error(
-        `Erro ao buscar conversa: ${error.message}`
+        `Failed to find conversation: ${error.message}`
       );
     }
 
@@ -106,7 +106,7 @@ export class SupabaseChatRepository
 
     if (error) {
       throw new Error(
-        `Erro ao salvar mensagens: ${error.message}`
+        `Failed to save messages: ${error.message}`
       );
     }
 
@@ -142,7 +142,7 @@ export class SupabaseChatRepository
 
     if (error) {
       throw new Error(
-        `Erro ao buscar mensagens: ${error.message}`
+        `Failed to fetch messages: ${error.message}`
       );
     }
 
